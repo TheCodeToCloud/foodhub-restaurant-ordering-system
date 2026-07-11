@@ -211,7 +211,7 @@ const Settings = () => {
           {/* Admin Profile Mini */}
           <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl shadow-md p-6 text-white text-center">
             {avatarSrc ? (
-              <img src={avatarSrc} alt="Admin Avatar" className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-white/30 mb-4 shadow-lg" />
+              <img src={avatarSrc} alt="Admin Avatar" onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullname || 'A')}&background=fed7aa&color=c2410c&bold=true`; }} className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-white/30 mb-4 shadow-lg" />
             ) : (
               <div className="w-24 h-24 mx-auto bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-4xl font-bold mb-4 border-4 border-white/30 shadow-lg">
                 {user?.fullname?.charAt(0) || 'A'}

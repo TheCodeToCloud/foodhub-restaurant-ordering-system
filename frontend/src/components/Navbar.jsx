@@ -54,7 +54,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 focus:outline-none"
               >
                 {avatarSrc ? (
-                  <img src={avatarSrc} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-orange-400" />
+                  <img src={avatarSrc} alt="avatar" onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullname || 'U')}&background=fed7aa&color=c2410c&bold=true`; }} className="w-8 h-8 rounded-full object-cover border-2 border-orange-400" />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-orange-100 border-2 border-orange-400 flex items-center justify-center text-orange-600 font-bold text-sm">
                     {initials}

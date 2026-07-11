@@ -96,7 +96,7 @@ const AdminLayout = () => {
         <div className={`p-4 border-t border-gray-100 flex flex-col gap-2 ${isSidebarOpen ? '' : 'items-center px-2'}`}>
           <div className={`flex items-center rounded-xl bg-gray-50 border border-gray-100 ${isSidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center p-2'}`} title={!isSidebarOpen ? user?.email : undefined}>
             {avatarSrc ? (
-              <img src={avatarSrc} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-orange-300 shrink-0" />
+              <img src={avatarSrc} alt="avatar" onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullname || 'A')}&background=fed7aa&color=c2410c&bold=true`; }} className="w-8 h-8 rounded-full object-cover border-2 border-orange-300 shrink-0" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold shrink-0">
                 {initials}

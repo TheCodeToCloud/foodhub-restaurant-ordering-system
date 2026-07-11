@@ -73,6 +73,7 @@ const Profile = () => {
                 <img
                   src={imageSrc}
                   alt="Profile"
+                  onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullname || 'U')}&background=fed7aa&color=c2410c&bold=true`; }}
                   className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                 />
               ) : (

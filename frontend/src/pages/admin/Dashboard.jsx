@@ -168,7 +168,7 @@ const Dashboard = () => {
                 <div key={customer.id} className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold shrink-0">
                     {customer.profile_image ? (
-                      <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `${BACKEND_URL}/${customer.profile_image}`} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                      <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `${BACKEND_URL}/${customer.profile_image}`} alt="avatar" onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(customer.fullname || 'U')}&background=ffedd5&color=ea580c&bold=true`; }} className="w-full h-full rounded-full object-cover" />
                     ) : (
                       customer.fullname.charAt(0).toUpperCase()
                     )}
