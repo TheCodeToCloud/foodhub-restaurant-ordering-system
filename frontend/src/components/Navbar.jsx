@@ -1,18 +1,28 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiLogOut, FiUser, FiMenu, FiX } from 'react-icons/fi';
+import { FiLogOut, FiUser, FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 import { useState } from 'react';
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, BACKEND_URL } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  const getAvatarSrc = () => {
+    if (!user?.profile_image) return null;
+    return user.profile_image.startsWith('http')
+      ? user.profile_image
+      : `${BACKEND_URL}/${user.profile_image}`;
+  };
+  const avatarSrc = getAvatarSrc();
+  const initials = (user?.fullname || user?.email || 'U').charAt(0).toUpperCase();
 
   const NavLinks = () => (
     <>
@@ -37,16 +47,40 @@ const Navbar = () => {
             </Link>
           )}
           <div className="flex items-center gap-4 ml-4">
-            <span className="flex items-center gap-1 text-sm font-medium text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-              <FiUser /> {user.fullname || user.email.split('@')[0]}
-            </span>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors"
-              title="Logout"
-            >
-              <FiLogOut size={18} />
-            </button>
+            {/* Avatar + Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 focus:outline-none"
+              >
+                {avatarSrc ? (
+                  <img src={avatarSrc} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-orange-400" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-orange-100 border-2 border-orange-400 flex items-center justify-center text-orange-600 font-bold text-sm">
+                    {initials}
+                  </div>
+                )}
+                <span className="text-sm font-medium text-gray-700 hidden md:block">{user.fullname || user.email.split('@')[0]}</span>
+                <FiChevronDown size={14} className="text-gray-500" />
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                  <Link
+                    to="/profile"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                  >
+                    <FiUser size={14} /> My Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <FiLogOut size={14} /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </>
       ) : (

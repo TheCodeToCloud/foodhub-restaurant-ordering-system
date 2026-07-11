@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import Cookies from 'js-cookie';
+import API, { BACKEND_URL } from '../api/axios';
 
 const AuthContext = createContext();
 
@@ -8,26 +9,21 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(Cookies.get('token') || null);
   const [loading, setLoading] = useState(true);
 
-  // Re-hydrate user state if a token exists
+  // Fetch fresh user data from server whenever token changes
   useEffect(() => {
     if (token) {
-      try {
-        // Since JWTs are base64Url encoded in the payload (2nd part), 
-        // we can decode it on the frontend to get user info (id, email, role).
-        const payload = token.split('.')[1];
-        const decoded = JSON.parse(atob(payload));
-        setUser(decoded);
-      } catch (err) {
-        console.error("Failed to decode token", err);
-        logout();
-      }
+      API.get('/users/profile')
+        .then(res => setUser(res.data))
+        .catch(() => logout())
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, [token]);
 
-  // Handle Login: set token in state & cookies, which triggers the useEffect
+  // Handle Login: set token in state & cookies
   const login = (newToken) => {
-    Cookies.set('token', newToken, { expires: 7 }); // expires in 7 days
+    Cookies.set('token', newToken, { expires: 7 });
     setToken(newToken);
   };
 
@@ -38,8 +34,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Update user data in context (called after profile edit)
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser, BACKEND_URL }}>
       {children}
     </AuthContext.Provider>
   );
@@ -49,3 +50,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+

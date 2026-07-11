@@ -10,16 +10,25 @@ import {
   FiSettings, 
   FiLogOut,
   FiMenu,
-  FiX
+  FiUser
 } from 'react-icons/fi';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const AdminLayout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, BACKEND_URL } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const getAvatarSrc = () => {
+    if (!user?.profile_image) return null;
+    return user.profile_image.startsWith('http')
+      ? user.profile_image
+      : `${BACKEND_URL}/${user.profile_image}`;
+  };
+  const avatarSrc = getAvatarSrc();
+  const initials = (user?.fullname || user?.email || 'A').charAt(0).toUpperCase();
 
   const handleLogout = () => {
     logout();
@@ -33,6 +42,7 @@ const AdminLayout = () => {
     { path: '/admin/orders', icon: <FiShoppingBag />, label: 'Orders' },
     { path: '/admin/customers', icon: <FiUsers />, label: 'Customers' },
     { path: '/admin/settings', icon: <FiSettings />, label: 'Settings' },
+    { path: '/admin/profile', icon: <FiUser />, label: 'My Profile' },
   ];
 
   return (
@@ -85,9 +95,13 @@ const AdminLayout = () => {
         {/* User Info & Logout */}
         <div className={`p-4 border-t border-gray-100 flex flex-col gap-2 ${isSidebarOpen ? '' : 'items-center px-2'}`}>
           <div className={`flex items-center rounded-xl bg-gray-50 border border-gray-100 ${isSidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center p-2'}`} title={!isSidebarOpen ? user?.email : undefined}>
-            <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold shrink-0">
-              {user?.fullname?.charAt(0) || user?.email?.charAt(0) || 'A'}
-            </div>
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-orange-300 shrink-0" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold shrink-0">
+                {initials}
+              </div>
+            )}
             {isSidebarOpen && (
               <div className="flex-1 overflow-hidden">
                 <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullname || 'Admin'}</p>

@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Menu from './pages/customer/Menu';
 import MyOrders from './pages/customer/MyOrders';
+import Profile from './pages/shared/Profile';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
 import Categories from './pages/admin/Categories';
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: 'customer/orders',
         element: <MyOrders />
+      },
+      {
+        path: 'profile',
+        element: <Profile />
       }
     ]
   },
@@ -77,6 +82,10 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <Settings />
+      },
+      {
+        path: "profile",
+        element: <Profile />
       }
     ]
   }
