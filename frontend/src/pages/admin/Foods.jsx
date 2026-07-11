@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../api/axios';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiImage } from 'react-icons/fi';
 
 const Foods = () => {
@@ -190,7 +190,7 @@ const Foods = () => {
                     <td className="px-6 py-4">
                       {food.image ? (
                         <img 
-                          src={food.image.startsWith('http') ? food.image : `http://localhost:5000/${food.image}`} 
+                          src={food.image.startsWith('http') ? food.image : `${BACKEND_URL}/${food.image}`} 
                           alt={food.food_name} 
                           className="w-10 h-10 rounded-lg object-cover border border-gray-200"
                         />
