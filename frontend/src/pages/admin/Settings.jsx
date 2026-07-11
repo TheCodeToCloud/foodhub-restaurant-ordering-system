@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import API from '../../api/axios';
 import { FiSave, FiLock, FiInfo, FiClock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
@@ -31,16 +32,22 @@ const Settings = () => {
     toast.success('Restaurant information updated successfully!');
   };
 
-  const handleUpdatePassword = (e) => {
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     if (newPassword.length < 6) {
       toast.error('New password must be at least 6 characters.');
       return;
     }
-    // Simulate API call
-    toast.success('Password updated successfully!');
-    setCurrentPassword('');
-    setNewPassword('');
+    
+    try {
+      await API.put('/users/password', { currentPassword, newPassword });
+      toast.success('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+    } catch (error) {
+      const errorMsg = error.response?.data?.error || 'Failed to update password. Please check your current password.';
+      toast.error(errorMsg);
+    }
   };
 
   const toggleStoreStatus = () => {

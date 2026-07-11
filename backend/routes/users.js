@@ -14,6 +14,7 @@ const upload = require("../middleware/upload");
 // ─── Profile routes (any logged-in user) ─────────────────────────────────────
 router.get("/profile", verifyToken, userController.getProfile);
 router.put("/profile", verifyToken, upload.single("profile_image"), userController.updateProfile);
+router.put("/password", verifyToken, userController.updatePassword);
 
 // ─── Admin-only routes ────────────────────────────────────────────────────────
 // GET /api/users

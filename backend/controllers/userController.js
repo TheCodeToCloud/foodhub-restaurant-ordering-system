@@ -6,6 +6,7 @@
 
 const pool = require("../config/db");
 const path = require("path");
+const bcrypt = require("bcryptjs");
 
 // ─── GET /api/users ───────────────────────────────────────────────────────────
 // Admin views all registered customers
@@ -71,9 +72,42 @@ const updateProfile = async (req, res) => {
   return res.status(200).json({ message: "Profile updated successfully.", user: rows[0] });
 };
 
+// ─── PUT /api/users/password ──────────────────────────────────────────────────
+// Logged-in user updates their password
+const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "Current and new password are required." });
+  }
+
+  // 1. Fetch user to get current hashed password
+  const [rows] = await pool.query("SELECT password FROM Users WHERE id = ?", [req.user.id]);
+  if (rows.length === 0) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  const user = rows[0];
+
+  // 2. Compare current password
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ error: "Incorrect current password." });
+  }
+
+  // 3. Hash new password and update
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  await pool.query("UPDATE Users SET password = ? WHERE id = ?", [hashedPassword, req.user.id]);
+
+  return res.status(200).json({ message: "Password updated successfully." });
+};
+
 module.exports = {
   getAllUsers,
   deleteUser,
   getProfile,
   updateProfile,
+  updatePassword,
 };
