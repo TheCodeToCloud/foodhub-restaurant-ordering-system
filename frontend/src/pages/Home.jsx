@@ -7,17 +7,22 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleOrderNow = (e) => {
+  const handlePrimaryAction = (e) => {
     e.preventDefault();
     if (user) {
       if (user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
-        navigate('/customer/menu');
+        navigate('/customer/orders');
       }
     } else {
       navigate('/login');
     }
+  };
+
+  const getPrimaryButtonText = () => {
+    if (!user) return 'Order Now';
+    return user.role === 'admin' ? 'Dashboard' : 'My Orders';
   };
 
   useEffect(() => {
@@ -52,10 +57,10 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <a 
                 href="#"
-                onClick={handleOrderNow}
+                onClick={handlePrimaryAction}
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-center"
               >
-                Order Now
+                {getPrimaryButtonText()}
               </a>
               <Link 
                 to="/customer/menu" 
