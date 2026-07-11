@@ -156,7 +156,7 @@ const Menu = () => {
                     {food.food_name}
                   </h3>
                   <span className="text-lg font-bold text-orange-600 shrink-0">
-                    ${Number(food.price).toFixed(2)}
+                    Rs. {Number(food.price).toFixed(2)}
                   </span>
                 </div>
                 
@@ -201,7 +201,7 @@ const Menu = () => {
               </button>
               <div className="absolute bottom-4 left-6 text-white">
                 <h3 className="text-xl font-bold truncate">{selectedFood.food_name}</h3>
-                <p className="font-semibold text-orange-400">${Number(selectedFood.price).toFixed(2)}</p>
+                <p className="font-semibold text-orange-400">Rs. {Number(selectedFood.price).toFixed(2)}</p>
               </div>
             </div>
             
@@ -240,7 +240,7 @@ const Menu = () => {
               <div className="border-t border-gray-100 pt-4 mb-8 flex justify-between items-center">
                 <span className="text-gray-500 font-medium">Total Price:</span>
                 <span className="text-3xl font-bold text-gray-900">
-                  ${(Number(selectedFood.price) * quantity).toFixed(2)}
+                  Rs. {(Number(selectedFood.price) * quantity).toFixed(2)}
                 </span>
               </div>
 

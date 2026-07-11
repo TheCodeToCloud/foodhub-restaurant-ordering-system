@@ -202,7 +202,7 @@ const Foods = () => {
                     </td>
                     <td className="px-6 py-4 text-gray-900 font-bold">{food.food_name}</td>
                     <td className="px-6 py-4 text-gray-600">{food.category_name}</td>
-                    <td className="px-6 py-4 text-gray-900 font-bold">${Number(food.price).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-gray-900 font-bold">Rs. {Number(food.price).toFixed(2)}</td>
                     <td className="px-6 py-4 text-gray-600">{food.quantity}</td>
                     <td className="px-6 py-4">
                       {food.quantity > 0 ? (
@@ -284,7 +284,7 @@ const Foods = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price ($) *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price (Rs.) *</label>
                   <input
                     type="number"
                     step="0.01"

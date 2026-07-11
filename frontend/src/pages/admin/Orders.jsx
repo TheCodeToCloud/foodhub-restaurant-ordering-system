@@ -122,7 +122,7 @@ const Orders = () => {
                       </td>
                       <td className="px-6 py-4 text-gray-600">{order.food_name}</td>
                       <td className="px-6 py-4 text-gray-600 font-medium">{order.quantity}</td>
-                      <td className="px-6 py-4 text-gray-900 font-bold">${Number(order.total_price).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-gray-900 font-bold">Rs. {Number(order.total_price).toFixed(2)}</td>
                       <td className="px-6 py-4 text-gray-500 text-xs">{formattedDate}</td>
                       <td className="px-6 py-4">
                         <StatusBadge status={order.status} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
+import API, { BACKEND_URL } from '../../api/axios';
 import { 
   FiShoppingBag, 
   FiUsers, 
@@ -72,7 +73,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard 
           title="Total Revenue" 
-          value={`$${Number(stats?.totalRevenue || 0).toLocaleString()}`}
+          value={`Rs. ${Number(stats?.totalRevenue || 0).toLocaleString()}`}
           icon={<FiDollarSign size={24} />} 
           bgColor="bg-green-50" 
           textColor="text-green-600" 
@@ -143,7 +144,7 @@ const Dashboard = () => {
                       <td className="px-6 py-4">
                         <StatusBadge status={order.status} />
                       </td>
-                      <td className="px-6 py-4 text-gray-900 font-medium">${Number(order.total_price).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-gray-900 font-medium">Rs. {Number(order.total_price).toFixed(2)}</td>
                     </tr>
                   ))
                 ) : (
@@ -167,7 +168,7 @@ const Dashboard = () => {
                 <div key={customer.id} className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold shrink-0">
                     {customer.profile_image ? (
-                      <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `http://localhost:5000/${customer.profile_image}`} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                      <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `${BACKEND_URL}/${customer.profile_image}`} alt="avatar" className="w-full h-full rounded-full object-cover" />
                     ) : (
                       customer.fullname.charAt(0).toUpperCase()
                     )}

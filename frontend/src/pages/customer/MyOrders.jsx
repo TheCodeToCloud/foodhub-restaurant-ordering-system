@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../api/axios';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiClock, FiXCircle } from 'react-icons/fi';
 
 const StatusBadge = ({ status }) => {
@@ -79,7 +79,7 @@ const MyOrders = () => {
                 {/* Food Image */}
                 <div className="w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden shrink-0">
                   {order.food_image ? (
-                    <img src={order.food_image?.startsWith('http') ? order.food_image : `http://localhost:5000/${order.food_image}`} alt={order.food_name} className="w-full h-full object-cover" />
+                    <img src={order.food_image?.startsWith('http') ? order.food_image : `${BACKEND_URL}/${order.food_image}`} alt={order.food_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
                   )}
@@ -98,11 +98,11 @@ const MyOrders = () => {
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 mb-4">
                     <span className="flex items-center gap-1.5"><FiClock className="text-gray-400"/> {dateObj.toLocaleString()}</span>
                     <span><strong className="text-gray-900">Qty:</strong> {order.quantity}</span>
-                    <span><strong className="text-gray-900">Price:</strong> ${Number(order.unit_price).toFixed(2)}</span>
+                    <span><strong className="text-gray-900">Price:</strong> Rs. {Number(order.unit_price).toFixed(2)}</span>
                   </div>
                   
                   <div className="text-lg font-extrabold text-orange-600">
-                    Total: ${Number(order.total_price).toFixed(2)}
+                    Total: Rs. {Number(order.total_price).toFixed(2)}
                   </div>
                 </div>
 

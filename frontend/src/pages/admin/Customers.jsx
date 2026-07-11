@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../api/axios';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiSearch, FiTrash2, FiExternalLink, FiUser } from 'react-icons/fi';
 
 const Customers = () => {
@@ -96,7 +96,7 @@ const Customers = () => {
                     <td className="px-6 py-4">
                       <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold shrink-0">
                         {customer.profile_image ? (
-                          <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `http://localhost:5000/${customer.profile_image}`} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                          <img src={customer.profile_image?.startsWith('http') ? customer.profile_image : `${BACKEND_URL}/${customer.profile_image}`} alt="avatar" className="w-full h-full rounded-full object-cover" />
                         ) : (
                           <FiUser size={20} />
                         )}

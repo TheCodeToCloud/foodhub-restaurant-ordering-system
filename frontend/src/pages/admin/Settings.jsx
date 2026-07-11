@@ -4,7 +4,15 @@ import { FiSave, FiLock, FiInfo, FiClock } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, BACKEND_URL } = useAuth();
+  
+  const getAvatarSrc = () => {
+    if (!user?.profile_image) return null;
+    return user.profile_image.startsWith('http')
+      ? user.profile_image
+      : `${BACKEND_URL}/${user.profile_image}`;
+  };
+  const avatarSrc = getAvatarSrc();
   
   // Dummy states for the UI
   const [storeName, setStoreName] = useState('FoodHub');
@@ -173,9 +181,13 @@ const Settings = () => {
 
           {/* Admin Profile Mini */}
           <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl shadow-md p-6 text-white text-center">
-            <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-3xl font-bold mb-4 border-2 border-white/30">
-              {user?.fullname?.charAt(0) || 'A'}
-            </div>
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="Admin Avatar" className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-white/30 mb-4 shadow-lg" />
+            ) : (
+              <div className="w-24 h-24 mx-auto bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-4xl font-bold mb-4 border-4 border-white/30 shadow-lg">
+                {user?.fullname?.charAt(0) || 'A'}
+              </div>
+            )}
             <h3 className="text-xl font-bold mb-1">{user?.fullname || 'Administrator'}</h3>
             <p className="text-white/80 text-sm mb-4">{user?.email}</p>
             <div className="bg-white/10 rounded-lg p-3 text-sm border border-white/20">
