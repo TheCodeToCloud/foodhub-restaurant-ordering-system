@@ -8,19 +8,8 @@
 const multer = require("multer");
 const path = require("path");
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Specify the directory where files will be stored
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    // Generate a unique filename using timestamp and original extension
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-  },
-});
+// Configure storage to use memory so we can save as Base64 strings directly in the database
+const storage = multer.memoryStorage();
 
 // Optional: Filter for image files only
 const fileFilter = (req, file, cb) => {

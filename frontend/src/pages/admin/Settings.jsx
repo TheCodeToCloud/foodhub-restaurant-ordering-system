@@ -9,7 +9,7 @@ const Settings = () => {
   
   const getAvatarSrc = () => {
     if (!user?.profile_image) return null;
-    return user.profile_image.startsWith('http')
+    return user.profile_image.match(/^(http|data:image)/)
       ? user.profile_image
       : `${BACKEND_URL}/${user.profile_image}`;
   };

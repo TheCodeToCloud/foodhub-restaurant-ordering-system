@@ -53,7 +53,13 @@ const getProfile = async (req, res) => {
 // Logged-in user updates their own profile & profile picture
 const updateProfile = async (req, res) => {
   const { fullname, phone, address } = req.body;
-  const profileImage = req.file ? `uploads/${req.file.filename}` : null;
+  let profileImage = null;
+
+  if (req.file) {
+    // Convert buffer to base64 string
+    const base64Image = req.file.buffer.toString("base64");
+    profileImage = `data:${req.file.mimetype};base64,${base64Image}`;
+  }
 
   let query, params;
   if (profileImage) {

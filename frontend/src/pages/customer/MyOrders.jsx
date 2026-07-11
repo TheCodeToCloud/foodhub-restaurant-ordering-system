@@ -79,7 +79,7 @@ const MyOrders = () => {
                 {/* Food Image */}
                 <div className="w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden shrink-0">
                   {order.food_image ? (
-                    <img src={order.food_image?.startsWith('http') ? order.food_image : `${BACKEND_URL}/${order.food_image}`} alt={order.food_name} className="w-full h-full object-cover" />
+                    <img src={order.food_image?.match(/^(http|data:image)/) ? order.food_image : `${BACKEND_URL}/${order.food_image}`} alt={order.food_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
                   )}

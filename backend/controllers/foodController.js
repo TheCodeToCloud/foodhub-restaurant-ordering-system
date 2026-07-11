@@ -9,15 +9,7 @@ const pool = require("../config/db");
 const fs = require("fs");
 const path = require("path");
 
-// ─── Helper function to delete an image file ──────────────────────────────────
-const deleteFile = (filename) => {
-  if (filename) {
-    const filePath = path.join(__dirname, "..", filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  }
-};
+// ─── Helper function removed since we now use memory storage (Base64) ────────
 
 // ─── GET /api/foods ───────────────────────────────────────────────────────────
 // Allows comprehensive searching/filtering
@@ -88,12 +80,13 @@ const getFoodById = async (req, res) => {
 const createFood = async (req, res) => {
   const { food_name, category_id, price, description, ingredients, quantity } = req.body;
   
-  // The multer middleware puts the uploaded file info in req.file
-  const imagePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
+  let imagePath = null;
+  if (req.file) {
+    const base64Image = req.file.buffer.toString("base64");
+    imagePath = `data:${req.file.mimetype};base64,${base64Image}`;
+  }
 
   if (!food_name || !category_id || !price) {
-    // Clean up uploaded file if validation fails
-    if (imagePath) deleteFile(imagePath);
     return res.status(400).json({ error: "food_name, category_id, and price are required." });
   }
 
@@ -126,8 +119,6 @@ const createFood = async (req, res) => {
       },
     });
   } catch (err) {
-    if (imagePath) deleteFile(imagePath);
-    
     // Handle foreign key violation for category_id
     if (err.code === "ER_NO_REFERENCED_ROW_2") {
       return res.status(400).json({ error: "Invalid category_id. Category does not exist." });
@@ -140,20 +131,20 @@ const createFood = async (req, res) => {
 const updateFood = async (req, res) => {
   const { id } = req.params;
   const { food_name, category_id, price, description, ingredients, quantity } = req.body;
-  const newImagePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
+  let newImagePath = null;
+  if (req.file) {
+    const base64Image = req.file.buffer.toString("base64");
+    newImagePath = `data:${req.file.mimetype};base64,${base64Image}`;
+  }
 
   try {
     // 1. Fetch existing food to get the old image path
     const [existingFoods] = await pool.query("SELECT image FROM Foods WHERE id = ?", [id]);
     
     if (existingFoods.length === 0) {
-      if (newImagePath) deleteFile(newImagePath);
       return res.status(404).json({ error: "Food item not found." });
     }
 
-    const oldImagePath = existingFoods[0].image;
-
-    // 2. Prepare update query dynamically
     let query = `UPDATE Foods SET `;
     const queryParams = [];
     const updates = [];
@@ -180,11 +171,6 @@ const updateFood = async (req, res) => {
     // 3. Execute update
     await pool.query(query, queryParams);
 
-    // 4. Delete old image if a new one was uploaded
-    if (newImagePath && oldImagePath) {
-      deleteFile(oldImagePath);
-    }
-
     // 5. Fetch updated row to return
     const [updatedFood] = await pool.query("SELECT * FROM Foods WHERE id = ?", [id]);
 
@@ -193,7 +179,6 @@ const updateFood = async (req, res) => {
       food: updatedFood[0],
     });
   } catch (err) {
-    if (newImagePath) deleteFile(newImagePath);
     if (err.code === "ER_NO_REFERENCED_ROW_2") {
       return res.status(400).json({ error: "Invalid category_id. Category does not exist." });
     }
@@ -206,21 +191,10 @@ const deleteFood = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1. Get image path before deleting
-    const [existingFoods] = await pool.query("SELECT image FROM Foods WHERE id = ?", [id]);
-    
-    if (existingFoods.length === 0) {
-      return res.status(404).json({ error: "Food item not found." });
-    }
-
-    const imagePath = existingFoods[0].image;
-
-    // 2. Delete from DB
     const [result] = await pool.query("DELETE FROM Foods WHERE id = ?", [id]);
 
-    // 3. Delete physical file
-    if (imagePath) {
-      deleteFile(imagePath);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Food item not found." });
     }
 
     return res.status(200).json({ message: "Food item deleted successfully." });

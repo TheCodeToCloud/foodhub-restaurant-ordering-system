@@ -133,7 +133,7 @@ const Menu = () => {
               <div className="relative h-48 w-full bg-gray-100 overflow-hidden group">
                 {food.image ? (
                   <img 
-                    src={food.image.startsWith('http') ? food.image : `${BACKEND_URL}/${food.image}`} 
+                    src={food.image.match(/^(http|data:image)/) ? food.image : `${BACKEND_URL}/${food.image}`} 
                     alt={food.food_name} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -190,7 +190,7 @@ const Menu = () => {
             <div className="relative h-32 bg-orange-100">
               {selectedFood.image && (
                 <img 
-                  src={selectedFood.image.startsWith('http') ? selectedFood.image : `${BACKEND_URL}/${selectedFood.image}`} 
+                  src={selectedFood.image.match(/^(http|data:image)/) ? selectedFood.image : `${BACKEND_URL}/${selectedFood.image}`} 
                   className="w-full h-full object-cover opacity-50" 
                   alt="bg"
                 />

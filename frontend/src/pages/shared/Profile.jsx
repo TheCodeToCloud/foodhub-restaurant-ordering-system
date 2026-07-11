@@ -16,7 +16,7 @@ const Profile = () => {
   const getImageSrc = () => {
     if (preview) return preview;
     if (user?.profile_image) {
-      return user.profile_image.startsWith('http')
+      return user.profile_image.match(/^(http|data:image)/)
         ? user.profile_image
         : `${BACKEND_URL}/${user.profile_image}`;
     }
