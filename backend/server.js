@@ -14,6 +14,18 @@ const pool = require("./config/db");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Run database migrations on startup
+(async () => {
+  try {
+    console.log("Running database migrations...");
+    await pool.query("ALTER TABLE Users MODIFY profile_image LONGTEXT");
+    await pool.query("ALTER TABLE Foods MODIFY image LONGTEXT");
+    console.log("Migrations completed successfully.");
+  } catch (err) {
+    console.error("Migration error (might be already applied or ignored):", err.message);
+  }
+})();
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 // Parse incoming JSON request bodies
