@@ -1,8 +1,24 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const { hash } = useLocation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleOrderNow = (e) => {
+    e.preventDefault();
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/customer/menu');
+      }
+    } else {
+      navigate('/login');
+    }
+  };
 
   useEffect(() => {
     if (hash) {
@@ -34,15 +50,16 @@ const Home = () => {
               Discover a world of flavors right at your fingertips. Order your favorite meals online and enjoy fast, reliable delivery.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <Link 
-                to="/login" 
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1"
+              <a 
+                href="#"
+                onClick={handleOrderNow}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-8 rounded-full shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 text-center"
               >
                 Order Now
-              </Link>
+              </a>
               <Link 
-                to="/#menu" 
-                className="bg-white border-2 border-gray-200 hover:border-orange-500 text-gray-800 hover:text-orange-500 font-semibold py-4 px-8 rounded-full transition-all"
+                to="/customer/menu" 
+                className="bg-white border-2 border-gray-200 hover:border-orange-500 text-gray-800 hover:text-orange-500 font-semibold py-4 px-8 rounded-full transition-all text-center"
               >
                 View Menu
               </Link>
