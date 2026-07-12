@@ -1,11 +1,14 @@
-const mysql = require("mysql2");
-require("dotenv").config();
-
 /**
+ * database/db.js
+ *
  * Creates a MySQL connection pool using credentials from environment variables.
  * Using a pool improves performance by reusing connections for multiple queries
  * rather than opening/closing a new connection on each request.
  */
+
+import mysql from "mysql2";
+import "dotenv/config";
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 3306,
@@ -15,8 +18,8 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
 });
 
 // Export the promise-based version of the pool so we can use async/await
-module.exports = pool.promise();
+export default pool.promise();

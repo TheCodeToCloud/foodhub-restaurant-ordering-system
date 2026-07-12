@@ -1,20 +1,6 @@
-/**
- * middleware/auth.js
- *
- * Provides middleware functions to protect routes by validating JSON Web Tokens
- * and verifying user roles.
- */
+import jwt from "jsonwebtoken";
 
-const jwt = require("jsonwebtoken");
-
-/**
- * Middleware: verifyToken
- *
- * Checks for a valid JWT in the Authorization header (Bearer <token>).
- * If valid, decodes the payload and attaches it to `req.user`.
- */
-const verifyToken = (req, res, next) => {
-  // Extract token from header: "Authorization: Bearer <token>"
+export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Access denied. No token provided." });
@@ -31,13 +17,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/**
- * Middleware: isAdmin
- *
- * Should be used AFTER verifyToken.
- * Checks if the decoded user has the 'admin' role.
- */
-const isAdmin = (req, res, next) => {
+export const isAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ error: "Access denied. User not authenticated." });
   }
@@ -47,9 +27,4 @@ const isAdmin = (req, res, next) => {
   }
 
   next();
-};
-
-module.exports = {
-  verifyToken,
-  isAdmin
 };

@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "description": "Backend API for a Restaurant Ordering System built with Express 5 and MySQL",
   "main": "server.js",
+  "type": "module",
   "scripts": {
+    "dev": "nodemon server.js",
     "start": "node server.js",
-    "dev": "node --watch server.js",
-    "db:init": "node config/init-db.js",
+    "db:init": "node init-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -21,5 +21,8 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
     "mysql2": "^3.22.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

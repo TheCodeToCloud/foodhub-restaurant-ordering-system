@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API, { BACKEND_URL } from '../../api/axios';
+import API, { BACKEND_URL } from '../../utils/api';
 import { FiClock, FiXCircle } from 'react-icons/fi';
 
 const StatusBadge = ({ status }) => {

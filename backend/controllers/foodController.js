@@ -1,19 +1,7 @@
-/**
- * controllers/foodController.js
- *
- * CRUD operations for Foods.
- * Includes handling for uploaded images (image path saved in DB).
- */
+import pool from "../database/db.js";
 
-const pool = require("../config/db");
-const fs = require("fs");
-const path = require("path");
-
-// ─── Helper function removed since we now use memory storage (Base64) ────────
-
-// ─── GET /api/foods ───────────────────────────────────────────────────────────
-// Allows comprehensive searching/filtering
-const getAllFoods = async (req, res) => {
+// GET /api/foods
+export const getAllFoods = async (req, res) => {
   const { search, category, minPrice, maxPrice } = req.query;
 
   let query = `
@@ -26,19 +14,14 @@ const getAllFoods = async (req, res) => {
   `;
   const queryParams = [];
 
-  // Filter by search string (matches name or ingredients)
   if (search) {
     query += ` AND (f.food_name LIKE ? OR f.ingredients LIKE ?)`;
     queryParams.push(`%${search}%`, `%${search}%`);
   }
-
-  // Filter by category ID
   if (category) {
     query += ` AND f.category_id = ?`;
     queryParams.push(category);
   }
-
-  // Filter by price range
   if (minPrice) {
     query += ` AND f.price >= ?`;
     queryParams.push(minPrice);
@@ -54,8 +37,8 @@ const getAllFoods = async (req, res) => {
   return res.status(200).json(rows);
 };
 
-// ─── GET /api/foods/:id ───────────────────────────────────────────────────────
-const getFoodById = async (req, res) => {
+// GET /api/foods/:id
+export const getFoodById = async (req, res) => {
   const { id } = req.params;
 
   const query = `
@@ -76,8 +59,8 @@ const getFoodById = async (req, res) => {
   return res.status(200).json(rows[0]);
 };
 
-// ─── POST /api/foods (Admin Only) ─────────────────────────────────────────────
-const createFood = async (req, res) => {
+// POST /api/foods
+export const createFood = async (req, res) => {
   const { food_name, category_id, price, description, ingredients, quantity } = req.body;
   
   let imagePath = null;
@@ -119,7 +102,6 @@ const createFood = async (req, res) => {
       },
     });
   } catch (err) {
-    // Handle foreign key violation for category_id
     if (err.code === "ER_NO_REFERENCED_ROW_2") {
       return res.status(400).json({ error: "Invalid category_id. Category does not exist." });
     }
@@ -127,8 +109,8 @@ const createFood = async (req, res) => {
   }
 };
 
-// ─── PUT /api/foods/:id (Admin Only) ──────────────────────────────────────────
-const updateFood = async (req, res) => {
+// PUT /api/foods/:id
+export const updateFood = async (req, res) => {
   const { id } = req.params;
   const { food_name, category_id, price, description, ingredients, quantity } = req.body;
   let newImagePath = null;
@@ -138,7 +120,6 @@ const updateFood = async (req, res) => {
   }
 
   try {
-    // 1. Fetch existing food to get the old image path
     const [existingFoods] = await pool.query("SELECT image FROM Foods WHERE id = ?", [id]);
     
     if (existingFoods.length === 0) {
@@ -168,10 +149,8 @@ const updateFood = async (req, res) => {
     query += updates.join(", ") + ` WHERE id = ?`;
     queryParams.push(id);
 
-    // 3. Execute update
     await pool.query(query, queryParams);
 
-    // 5. Fetch updated row to return
     const [updatedFood] = await pool.query("SELECT * FROM Foods WHERE id = ?", [id]);
 
     return res.status(200).json({
@@ -186,8 +165,8 @@ const updateFood = async (req, res) => {
   }
 };
 
-// ─── DELETE /api/foods/:id (Admin Only) ───────────────────────────────────────
-const deleteFood = async (req, res) => {
+// DELETE /api/foods/:id
+export const deleteFood = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -199,7 +178,6 @@ const deleteFood = async (req, res) => {
 
     return res.status(200).json({ message: "Food item deleted successfully." });
   } catch (err) {
-    // Foreign key constraint (e.g., used in Orders)
     if (err.code === "ER_ROW_IS_REFERENCED_2") {
       return res.status(400).json({
         error: "Cannot delete food because it is associated with one or more orders.",
@@ -207,12 +185,4 @@ const deleteFood = async (req, res) => {
     }
     throw err;
   }
-};
-
-module.exports = {
-  getAllFoods,
-  getFoodById,
-  createFood,
-  updateFood,
-  deleteFood,
 };

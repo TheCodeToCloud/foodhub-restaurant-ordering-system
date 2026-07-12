@@ -1,16 +1,12 @@
-/**
- * init-db.js
- *
- * Initialization script that connects to MySQL and runs the schema migration
- * to create all required tables (if they don't already exist).
- *
- * Usage:  node config/init-db.js
- */
+import "dotenv/config";
+import mysql from "mysql2/promise";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-require("dotenv").config();
-const mysql = require("mysql2/promise");
-const fs = require("fs");
-const path = require("path");
+// Reconstruct __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function initializeDatabase() {
   // Step 1 – Connect WITHOUT specifying a database so we can create it if needed
@@ -34,7 +30,7 @@ async function initializeDatabase() {
     await connection.query(`USE \`${dbName}\``);
 
     // Step 4 – Read and execute the SQL schema file
-    const schemaPath = path.join(__dirname, "schema.sql");
+    const schemaPath = path.join(__dirname, "database", "schema.sql");
     const schemaSql = fs.readFileSync(schemaPath, "utf-8");
 
     // Split on semicolons to execute each statement individually

@@ -1,15 +1,8 @@
-/**
- * controllers/adminController.js
- *
- * Special endpoints for the Admin Dashboard.
- */
+import pool from "../database/db.js";
 
-const pool = require("../config/db");
-
-// ─── GET /api/admin/dashboard-stats ───────────────────────────────────────────
-const getDashboardStats = async (req, res) => {
+// GET /api/admin/dashboard-stats
+export const getDashboardStats = async (req, res) => {
   try {
-    // Run multiple queries concurrently for better performance
     const [
       [foodRows],
       [customerRows],
@@ -51,8 +44,4 @@ const getDashboardStats = async (req, res) => {
   } catch (err) {
     throw err;
   }
-};
-
-module.exports = {
-  getDashboardStats,
 };

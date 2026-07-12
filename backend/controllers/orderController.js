@@ -1,16 +1,9 @@
-/**
- * controllers/orderController.js
- *
- * Handles order creation, fetching, and status updates.
- */
+import pool from "../database/db.js";
 
-const pool = require("../config/db");
-
-// ─── POST /api/orders ─────────────────────────────────────────────────────────
-// Protected: Any logged-in user can place an order
-const placeOrder = async (req, res) => {
+// POST /api/orders
+export const placeOrder = async (req, res) => {
   const { food_id, quantity, total_price } = req.body;
-  const user_id = req.user.id; // from verifyToken middleware
+  const user_id = req.user.id;
 
   if (!food_id || !quantity || !total_price) {
     return res.status(400).json({ error: "food_id, quantity, and total_price are required." });
@@ -28,7 +21,6 @@ const placeOrder = async (req, res) => {
       order_id: result.insertId,
     });
   } catch (err) {
-    // Check if food_id is invalid
     if (err.code === "ER_NO_REFERENCED_ROW_2") {
       return res.status(400).json({ error: "Invalid food_id. Food item does not exist." });
     }
@@ -36,9 +28,8 @@ const placeOrder = async (req, res) => {
   }
 };
 
-// ─── GET /api/orders ──────────────────────────────────────────────────────────
-// Protected: Admin sees all, Customer sees only their own
-const getOrders = async (req, res) => {
+// GET /api/orders
+export const getOrders = async (req, res) => {
   const { id: user_id, role } = req.user;
 
   let query = `
@@ -53,7 +44,6 @@ const getOrders = async (req, res) => {
   const queryParams = [];
 
   if (role !== "admin") {
-    // Customer sees only their own history
     query += ` WHERE o.user_id = ?`;
     queryParams.push(user_id);
   }
@@ -64,9 +54,8 @@ const getOrders = async (req, res) => {
   return res.status(200).json(rows);
 };
 
-// ─── PUT /api/orders/:id ──────────────────────────────────────────────────────
-// Protected: Admin updates status anywhere. Customer cancels only if 'Pending'.
-const updateOrderStatus = async (req, res) => {
+// PUT /api/orders/:id
+export const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const { id: user_id, role } = req.user;
@@ -80,7 +69,6 @@ const updateOrderStatus = async (req, res) => {
     return res.status(400).json({ error: "Invalid status value." });
   }
 
-  // First fetch the order to check its current state and ownership
   const [orders] = await pool.query("SELECT user_id, status FROM Orders WHERE id = ?", [id]);
   if (orders.length === 0) {
     return res.status(404).json({ error: "Order not found." });
@@ -88,13 +76,10 @@ const updateOrderStatus = async (req, res) => {
 
   const order = orders[0];
 
-  // If customer is trying to update
   if (role !== "admin") {
-    // Can only update their own order
     if (order.user_id !== user_id) {
       return res.status(403).json({ error: "You do not have permission to modify this order." });
     }
-    // Can only cancel, and only if it's currently Pending
     if (status !== "Cancelled") {
       return res.status(403).json({ error: "Customers can only cancel orders." });
     }
@@ -103,7 +88,6 @@ const updateOrderStatus = async (req, res) => {
     }
   }
 
-  // Proceed with update
   await pool.query("UPDATE Orders SET status = ? WHERE id = ?", [status, id]);
 
   return res.status(200).json({
@@ -111,10 +95,4 @@ const updateOrderStatus = async (req, res) => {
     order_id: id,
     status,
   });
-};
-
-module.exports = {
-  placeOrder,
-  getOrders,
-  updateOrderStatus,
 };

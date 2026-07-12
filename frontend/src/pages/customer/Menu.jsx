@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API, { BACKEND_URL } from '../../api/axios';
+import API, { BACKEND_URL } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import { FiSearch, FiShoppingCart, FiX, FiInfo } from 'react-icons/fi';
 

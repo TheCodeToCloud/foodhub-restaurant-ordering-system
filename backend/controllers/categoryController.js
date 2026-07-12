@@ -1,19 +1,13 @@
-/**
- * controllers/categoryController.js
- *
- * CRUD operations for Categories.
- */
+import pool from "../database/db.js";
 
-const pool = require("../config/db");
-
-// ─── GET /api/categories ──────────────────────────────────────────────────────
-const getAllCategories = async (req, res) => {
+// GET /api/categories
+export const getAllCategories = async (req, res) => {
   const [rows] = await pool.query("SELECT * FROM Categories ORDER BY category_name ASC");
   return res.status(200).json(rows);
 };
 
-// ─── POST /api/categories (Admin Only) ────────────────────────────────────────
-const createCategory = async (req, res) => {
+// POST /api/categories
+export const createCategory = async (req, res) => {
   const { category_name } = req.body;
 
   if (!category_name) {
@@ -34,7 +28,6 @@ const createCategory = async (req, res) => {
       },
     });
   } catch (err) {
-    // Handle unique constraint violation
     if (err.code === "ER_DUP_ENTRY") {
       return res.status(409).json({ error: "Category name already exists." });
     }
@@ -42,8 +35,8 @@ const createCategory = async (req, res) => {
   }
 };
 
-// ─── PUT /api/categories/:id (Admin Only) ─────────────────────────────────────
-const updateCategory = async (req, res) => {
+// PUT /api/categories/:id
+export const updateCategory = async (req, res) => {
   const { id } = req.params;
   const { category_name } = req.body;
 
@@ -73,8 +66,8 @@ const updateCategory = async (req, res) => {
   }
 };
 
-// ─── DELETE /api/categories/:id (Admin Only) ──────────────────────────────────
-const deleteCategory = async (req, res) => {
+// DELETE /api/categories/:id
+export const deleteCategory = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -86,7 +79,6 @@ const deleteCategory = async (req, res) => {
 
     return res.status(200).json({ message: "Category deleted successfully." });
   } catch (err) {
-    // Check for foreign key constraint violation (Foods depending on this category)
     if (err.code === "ER_ROW_IS_REFERENCED_2") {
       return res.status(400).json({
         error: "Cannot delete category because it is associated with one or more foods.",
@@ -94,11 +86,4 @@ const deleteCategory = async (req, res) => {
     }
     throw err;
   }
-};
-
-module.exports = {
-  getAllCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
 };

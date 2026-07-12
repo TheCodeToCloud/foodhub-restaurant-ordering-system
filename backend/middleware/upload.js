@@ -1,17 +1,17 @@
 /**
- * middleware/upload.js
+ * config/multer.js
  *
  * Configures Multer to handle file uploads.
- * Saves files to the 'uploads/' directory with unique timestamp-based names.
+ * Uses memory storage so files can be converted to Base64 strings
+ * and stored directly in the database, avoiding the need to write to disk.
  */
 
-const multer = require("multer");
-const path = require("path");
+import multer from "multer";
 
-// Configure storage to use memory so we can save as Base64 strings directly in the database
+// Use memory storage so we can convert the file buffer to Base64
 const storage = multer.memoryStorage();
 
-// Optional: Filter for image files only
+// Filter: accept image files only
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -20,13 +20,13 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize multer upload instance
+// Initialize and export the multer upload instance
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage,
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
 });
 
-module.exports = upload;
+export default upload;

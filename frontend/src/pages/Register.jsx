@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import API from '../api/axios';
+import API from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { FiUser, FiMail, FiLock, FiPhone, FiMapPin, FiLoader, FiEye, FiEyeOff } from 'react-icons/fi';
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../api/axios';
+import API from '../../utils/api';
 import { FiSave, FiLock, FiInfo, FiClock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
