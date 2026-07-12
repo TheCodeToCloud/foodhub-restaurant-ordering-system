@@ -21,17 +21,7 @@ import adminRouter      from "./router/admin.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Run database migrations on startup
-(async () => {
-  try {
-    console.log("Running database migrations...");
-    await pool.query("ALTER TABLE Users MODIFY profile_image LONGTEXT");
-    await pool.query("ALTER TABLE Foods MODIFY image LONGTEXT");
-    console.log("Migrations completed successfully.");
-  } catch (err) {
-    console.error("Migration error (might be already applied or ignored):", err.message);
-  }
-})();
+// Migration script removed to prevent startup crashes
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
@@ -39,6 +29,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ─── Manual Migration Route ───────────────────────────────────────────────────
+app.get("/api/migrate-db", async (req, res) => {
+  try {
+    await pool.query("ALTER TABLE Users MODIFY profile_image LONGTEXT");
+    await pool.query("ALTER TABLE Foods MODIFY image LONGTEXT");
+    res.json({ message: "Database tables migrated successfully for LONGTEXT!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ─── Health-check route ───────────────────────────────────────────────────────
 
