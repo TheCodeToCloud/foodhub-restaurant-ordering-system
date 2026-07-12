@@ -30,16 +30,71 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ─── Manual Migration Route ───────────────────────────────────────────────────
+// ─── Manual Migration / Setup Route ────────────────────────────────────────────────
 app.get("/api/migrate-db", async (req, res) => {
-  try {
-    await pool.query("ALTER TABLE Users MODIFY profile_image LONGTEXT");
-    await pool.query("ALTER TABLE Foods MODIFY image LONGTEXT");
-    res.json({ message: "Database tables migrated successfully for LONGTEXT!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const results = [];
+  const errors = [];
+
+  const queries = [
+    `CREATE TABLE IF NOT EXISTS Users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      fullname VARCHAR(150) NOT NULL,
+      email VARCHAR(150) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      phone VARCHAR(20),
+      address VARCHAR(255),
+      role VARCHAR(20) NOT NULL DEFAULT 'customer',
+      profile_image LONGTEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS Categories (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      category_name VARCHAR(100) NOT NULL UNIQUE
+    )`,
+    `CREATE TABLE IF NOT EXISTS Foods (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      food_name VARCHAR(150) NOT NULL,
+      category_id INT NOT NULL,
+      price DECIMAL(10,2) NOT NULL,
+      description TEXT,
+      ingredients TEXT,
+      quantity INT NOT NULL DEFAULT 0,
+      image LONGTEXT,
+      FOREIGN KEY (category_id) REFERENCES Categories(id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS Orders (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      food_id INT NOT NULL,
+      quantity INT NOT NULL,
+      total_price DECIMAL(10,2) NOT NULL,
+      status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+      order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES Users(id),
+      FOREIGN KEY (food_id) REFERENCES Foods(id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS Settings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      store_name VARCHAR(150) DEFAULT 'FoodHub',
+      contact_email VARCHAR(150) DEFAULT 'hello@foodhub.com',
+      phone VARCHAR(50) DEFAULT '',
+      is_open TINYINT(1) DEFAULT 1
+    )`,
+    `ALTER TABLE Users MODIFY profile_image LONGTEXT`,
+    `ALTER TABLE Foods MODIFY image LONGTEXT`,
+  ];
+
+  for (const q of queries) {
+    try {
+      await pool.query(q);
+      results.push({ ok: q.substring(0, 60) });
+    } catch (err) {
+      errors.push({ query: q.substring(0, 60), error: err.message });
+    }
   }
+
+  res.json({ message: "Migration done!", results, errors });
 });
+
 
 // ─── Health-check route ───────────────────────────────────────────────────────
 
