@@ -15,6 +15,7 @@ import Orders from './pages/admin/Orders';
 import Customers from './pages/admin/Customers';
 import Settings from './pages/admin/Settings';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Simple placeholder for unimplemented admin pages
 const Placeholder = ({ title }) => (
@@ -57,8 +58,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <ProtectedRoute requireAdmin={true} />,
     children: [
+      {
+        path: "",
+        element: <AdminLayout />,
+        children: [
       {
         path: "dashboard",
         element: <Dashboard />
@@ -86,6 +91,8 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />
+      }
+    ]
       }
     ]
   }

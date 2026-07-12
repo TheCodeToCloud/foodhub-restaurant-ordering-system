@@ -9,22 +9,50 @@ export const placeOrder = async (req, res) => {
     return res.status(400).json({ error: "food_id, quantity, and total_price are required." });
   }
 
+  const connection = await pool.getConnection();
   try {
-    const [result] = await pool.query(
+    await connection.beginTransaction();
+
+    // 1. Check if food exists and has enough stock
+    const [foods] = await connection.query(
+      "SELECT quantity FROM Foods WHERE id = ? FOR UPDATE",
+      [food_id]
+    );
+
+    if (foods.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: "Food item does not exist." });
+    }
+
+    if (foods[0].quantity < quantity) {
+      await connection.rollback();
+      return res.status(400).json({ error: "Not enough stock available." });
+    }
+
+    // 2. Create the order
+    const [result] = await connection.query(
       `INSERT INTO Orders (user_id, food_id, quantity, total_price, status)
        VALUES (?, ?, ?, ?, 'Pending')`,
       [user_id, food_id, quantity, total_price]
     );
+
+    // 3. Deduct the ordered quantity from stock
+    await connection.query(
+      "UPDATE Foods SET quantity = quantity - ? WHERE id = ?",
+      [quantity, food_id]
+    );
+
+    await connection.commit();
 
     return res.status(201).json({
       message: "Order placed successfully.",
       order_id: result.insertId,
     });
   } catch (err) {
-    if (err.code === "ER_NO_REFERENCED_ROW_2") {
-      return res.status(400).json({ error: "Invalid food_id. Food item does not exist." });
-    }
+    await connection.rollback();
     throw err;
+  } finally {
+    connection.release();
   }
 };
 
@@ -69,30 +97,58 @@ export const updateOrderStatus = async (req, res) => {
     return res.status(400).json({ error: "Invalid status value." });
   }
 
-  const [orders] = await pool.query("SELECT user_id, status FROM Orders WHERE id = ?", [id]);
-  if (orders.length === 0) {
-    return res.status(404).json({ error: "Order not found." });
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [orders] = await connection.query(
+      "SELECT user_id, status, food_id, quantity FROM Orders WHERE id = ? FOR UPDATE",
+      [id]
+    );
+    
+    if (orders.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    const order = orders[0];
+
+    if (role !== "admin") {
+      if (order.user_id !== user_id) {
+        await connection.rollback();
+        return res.status(403).json({ error: "You do not have permission to modify this order." });
+      }
+      if (status !== "Cancelled") {
+        await connection.rollback();
+        return res.status(403).json({ error: "Customers can only cancel orders." });
+      }
+      if (order.status !== "Pending") {
+        await connection.rollback();
+        return res.status(400).json({ error: "Cannot cancel order that is no longer pending." });
+      }
+    }
+
+    // If order is newly cancelled, restore the food stock
+    if (status === "Cancelled" && order.status !== "Cancelled") {
+      await connection.query(
+        "UPDATE Foods SET quantity = quantity + ? WHERE id = ?",
+        [order.quantity, order.food_id]
+      );
+    }
+
+    await connection.query("UPDATE Orders SET status = ? WHERE id = ?", [status, id]);
+    
+    await connection.commit();
+
+    return res.status(200).json({
+      message: "Order status updated successfully.",
+      order_id: id,
+      status,
+    });
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
   }
-
-  const order = orders[0];
-
-  if (role !== "admin") {
-    if (order.user_id !== user_id) {
-      return res.status(403).json({ error: "You do not have permission to modify this order." });
-    }
-    if (status !== "Cancelled") {
-      return res.status(403).json({ error: "Customers can only cancel orders." });
-    }
-    if (order.status !== "Pending") {
-      return res.status(400).json({ error: "Cannot cancel order that is no longer pending." });
-    }
-  }
-
-  await pool.query("UPDATE Orders SET status = ? WHERE id = ?", [status, id]);
-
-  return res.status(200).json({
-    message: "Order status updated successfully.",
-    order_id: id,
-    status,
-  });
 };

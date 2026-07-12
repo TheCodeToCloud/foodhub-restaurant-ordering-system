@@ -45,3 +45,38 @@ export const getDashboardStats = async (req, res) => {
     throw err;
   }
 };
+
+// GET /api/admin/settings
+export const getSettings = async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM Settings WHERE id = 1");
+  if (rows.length === 0) {
+    return res.status(200).json({ 
+      store_name: 'FoodHub', 
+      contact_email: 'hello@foodhub.com', 
+      phone: '+1 (555) 123-4567', 
+      is_open: 1 
+    });
+  }
+  return res.status(200).json(rows[0]);
+};
+
+// PUT /api/admin/settings
+export const updateSettings = async (req, res) => {
+  const { store_name, contact_email, phone, is_open } = req.body;
+  const [rows] = await pool.query("SELECT id FROM Settings WHERE id = 1");
+  
+  if (rows.length === 0) {
+    await pool.query(
+      "INSERT INTO Settings (id, store_name, contact_email, phone, is_open) VALUES (1, ?, ?, ?, ?)", 
+      [store_name, contact_email, phone, is_open]
+    );
+  } else {
+    await pool.query(
+      "UPDATE Settings SET store_name = ?, contact_email = ?, phone = ?, is_open = ? WHERE id = 1", 
+      [store_name, contact_email, phone, is_open]
+    );
+  }
+  
+  const [updated] = await pool.query("SELECT * FROM Settings WHERE id = 1");
+  return res.status(200).json({ message: "Settings updated successfully.", settings: updated[0] });
+};
