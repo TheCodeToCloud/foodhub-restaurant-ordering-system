@@ -82,15 +82,14 @@ async function startServer() {
     const connection = await pool.getConnection();
     console.log("✅  MySQL connection pool established successfully.");
     connection.release();
-
-    app.listen(PORT, () => {
-      console.log(`🚀  Server is running on http://localhost:${PORT}`);
-      console.log(`📋  Environment: ${process.env.NODE_ENV || "development"}`);
-    });
   } catch (err) {
-    console.error("❌  Failed to connect to the database:", err.message);
-    process.exit(1);
+    console.error("⚠️  Failed to connect to the database initially, but starting server anyway. Error:", err.message);
   }
+
+  app.listen(PORT, () => {
+    console.log(`🚀  Server is running on http://localhost:${PORT}`);
+    console.log(`📋  Environment: ${process.env.NODE_ENV || "development"}`);
+  });
 }
 
 startServer();
