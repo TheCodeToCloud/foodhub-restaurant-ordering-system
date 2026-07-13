@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API, { BACKEND_URL } from '../../utils/api';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiClock, FiXCircle } from 'react-icons/fi';
 
 const StatusBadge = ({ status }) => {
@@ -11,9 +11,9 @@ const StatusBadge = ({ status }) => {
     Delivered: 'bg-gray-100 text-gray-700',
     Cancelled: 'bg-red-100 text-red-700'
   };
-  
+
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-bold ${styles[status] || 'bg-gray-100 text-gray-700'}`}>
+    <span className={`px-3 small-font py-1 rounded-full text-xs font-bold ${styles[status] || 'bg-gray-100 text-gray-700'}`}>
       {status}
     </span>
   );
@@ -44,7 +44,7 @@ const MyOrders = () => {
         await API.put(`/orders/${orderId}`, { status: 'Cancelled' });
         toast.success('Order cancelled successfully.');
         // Update state locally
-        setOrders(orders.map(order => 
+        setOrders(orders.map(order =>
           order.id === orderId ? { ...order, status: 'Cancelled' } : order
         ));
       } catch (error) {
@@ -64,7 +64,7 @@ const MyOrders = () => {
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">My Orders</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2 ">My Orders</h1>
         <p className="text-gray-500">View your active and past orders</p>
       </div>
 
@@ -73,7 +73,7 @@ const MyOrders = () => {
           {orders.map((order) => {
             const dateObj = new Date(order.order_date);
             const isPending = order.status === 'Pending';
-            
+
             return (
               <div key={order.id} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col md:flex-row gap-6 items-start md:items-center">
                 {/* Food Image */}

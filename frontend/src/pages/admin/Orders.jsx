@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../utils/api';
+import API from '../../api/axios';
 import { FiSearch } from 'react-icons/fi';
 
 const StatusBadge = ({ status }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../utils/api';
+import API from '../../api/axios';
 import { FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 
 const Categories = () => {

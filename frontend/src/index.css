@@ -1,1 +1,32 @@
+@import url('https://googleapis.com');
 @import "tailwindcss";
+
+/* Apply globally to the entire app */
+.header {
+    font-family: "Yuyu", sans-serif;
+}
+
+/* Or apply to a specific utility class */
+.custom-font {
+    font-family: 'Poppins', sans-serif;
+}
+
+.subhead-font {
+    font-family: "Lobster", sans-serif;
+}
+
+.small-font {
+    font-family: "Poppins", sans-serif;
+}
+
+.head-font {
+    font-family: "Playfair Display", serif;
+}
+
+.head2-font {
+    font-family: "Fraunces", serif;
+}
+
+.para-font {
+    font-family: "Lobster Two", sans-serif;
+}

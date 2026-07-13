@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import API, { BACKEND_URL } from '../../utils/api';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiImage } from 'react-icons/fi';
 
 const Foods = () => {

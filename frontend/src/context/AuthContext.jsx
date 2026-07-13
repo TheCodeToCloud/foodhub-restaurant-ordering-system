@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import Cookies from 'js-cookie';
-import API, { BACKEND_URL } from '../utils/api';
+import API, { BACKEND_URL } from '../api/axios';
 
 const AuthContext = createContext();
 

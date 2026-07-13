@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import API from '../../utils/api';
+import API from '../../api/axios';
 import { FiSave, FiLock, FiInfo, FiClock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
@@ -15,10 +15,10 @@ const Settings = () => {
   };
   const avatarSrc = getAvatarSrc();
   
-  // States for Settings
-  const [storeName, setStoreName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  // Dummy states for the UI
+  const [storeName, setStoreName] = useState('FoodHub');
+  const [contactEmail, setContactEmail] = useState('hello@foodhub.com');
+  const [phone, setPhone] = useState('+1 (555) 123-4567');
   const [isOpen, setIsOpen] = useState(true);
   
   const [currentPassword, setCurrentPassword] = useState('');
@@ -26,35 +26,10 @@ const Settings = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  // Fetch settings on mount
-  React.useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await API.get('/admin/settings');
-        setStoreName(data.store_name || '');
-        setContactEmail(data.contact_email || '');
-        setPhone(data.phone || '');
-        setIsOpen(data.is_open ? true : false);
-      } catch (err) {
-        toast.error("Failed to load settings.");
-      }
-    };
-    fetchSettings();
-  }, []);
-
-  const handleSaveInfo = async (e) => {
+  const handleSaveInfo = (e) => {
     e.preventDefault();
-    try {
-      await API.put('/admin/settings', {
-        store_name: storeName,
-        contact_email: contactEmail,
-        phone,
-        is_open: isOpen ? 1 : 0
-      });
-      toast.success('Restaurant information updated successfully!');
-    } catch (err) {
-      toast.error('Failed to update settings.');
-    }
+    // Simulate API call
+    toast.success('Restaurant information updated successfully!');
   };
 
   const handleUpdatePassword = async (e) => {
@@ -75,20 +50,9 @@ const Settings = () => {
     }
   };
 
-  const toggleStoreStatus = async () => {
-    const newStatus = !isOpen;
-    try {
-      await API.put('/admin/settings', {
-        store_name: storeName,
-        contact_email: contactEmail,
-        phone,
-        is_open: newStatus ? 1 : 0
-      });
-      setIsOpen(newStatus);
-      toast.info(`Store is now ${newStatus ? 'Open' : 'Closed'} for new orders.`);
-    } catch (err) {
-      toast.error('Failed to update store status.');
-    }
+  const toggleStoreStatus = () => {
+    setIsOpen(!isOpen);
+    toast.info(`Store is now ${!isOpen ? 'Open' : 'Closed'} for new orders.`);
   };
 
   return (

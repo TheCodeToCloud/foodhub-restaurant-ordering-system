@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FiUser, FiPhone, FiMapPin, FiCamera, FiSave } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
-import API from '../../utils/api';
+import API from '../../api/axios';
 
 const Profile = () => {
   const { user, updateUser, BACKEND_URL } = useAuth();

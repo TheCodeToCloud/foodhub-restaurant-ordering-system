@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import API, { BACKEND_URL } from '../../utils/api';
+import API, { BACKEND_URL } from '../../api/axios';
 import { FiSearch, FiTrash2, FiExternalLink, FiUser } from 'react-icons/fi';
 
 const Customers = () => {
